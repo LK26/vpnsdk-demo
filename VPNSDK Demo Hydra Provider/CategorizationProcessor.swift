@@ -12,14 +12,14 @@ class CategorizationProcessor {
     let notificationRequestIdentifier = "neprovider.notificationRequestIdentifier"
     let workQueue = DispatchQueue(label: "neprovider.CategorizationProcessor.workQueue")
 
-    func process(_ hydraCategorization: AFHydraCategorization) {
+    func process(_ hydraCategorization: VPNCategorization) {
         if hydraCategorization.action == .bypass {
             return
         }
         sendUserNotificationIfAuthorized(hydraCategorization)
     }
 
-    private func sendUserNotificationIfAuthorized(_ hydraCategorization: AFHydraCategorization) {
+    private func sendUserNotificationIfAuthorized(_ hydraCategorization: VPNCategorization) {
         LocalNotificationSender.sendNotification(
             with: hydraCategorization.userNotificationContent,
             identifier: self.notificationRequestIdentifier
@@ -33,8 +33,8 @@ extension CategorizationProcessor {
     }
 }
 
-private extension AFHydraCategorization {
-    var localTimestamp: Date? {
+private extension VPNCategorization {
+    var localTimestamp: Date {
         let timezone = TimeZone.current
         let seconds = TimeInterval(timezone.secondsFromGMT(for: self.timestamp))
         return Date(timeInterval: seconds, since: self.timestamp)
@@ -50,14 +50,9 @@ private extension AFHydraCategorization {
             }
             sourcesText.append(" \(source)")
         }
-        var categoryText = ""
-        if let category_label = self.category_label {
-            categoryText = " CAT: \(category_label);"
-        }
-        var timestampText = ""
-        if let timestamp = self.localTimestamp {
-            timestampText = " T: \(timestamp)"
-        }
+
+        let categoryText = " CAT: \(self.categoryLabel);"
+        let timestampText = " T: \(self.localTimestamp)"
 
         content.title = self.resource
         content.body = "\(self.actionEmoji)\(categoryText) SRC: \(sourcesText);\(timestampText)"
@@ -68,7 +63,7 @@ private extension AFHydraCategorization {
         switch self.action {
         case .proxy:
             return "🅿️"
-        case .VPN:
+        case .vpn:
             return "🛡"
         case .bypass:
             return "✅"

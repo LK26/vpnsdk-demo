@@ -7,14 +7,12 @@
 
 import VPNTunnelProviderSDK
 
-class PacketTunnelProvider: NSObject, AFNetworkExtensionDelegate {
+class PacketTunnelProvider: NSObject, NetworkExtensionDelegate {
     private let categorizationProcessor = CategorizationProcessor.default()
 
-    func vpnWillStart(with options: StartupOptions!) {
-        print("is bypass mode enabled = \(options.isBypassEnabled)")
-    }
+    var fireshieldManager: FireshieldManager?
 
-    func resourceBlocked(_ categorization: AFHydraCategorization!) {
+    func vpnDidHandleCategorization(_ categorization: VPNCategorization) {
         categorizationProcessor.process(categorization)
     }
 }
